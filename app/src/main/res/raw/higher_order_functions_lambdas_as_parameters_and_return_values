@@ -1,0 +1,62 @@
+This chapter covers
+  Function types
+  Higher-order functions and their use for structuring code
+  Inline functions
+  Non-local returns and labels
+  Anonymous functions
+
+ -> how to create higher-order functions
+
+ -> why?
+  - your own functions that take lambdas as parameters or return them. You’ll see how
+   higher-order functions can help simplify your code, remove code duplication, and build
+   nice abstractions.
+  -  become acquainted with inline functions—a powerful
+    Kotlin feature that removes the performance overhead associated with using lambdas and
+                                                        enables more flexible control flow within lambdas.
+
+1 - Declaring higher-order functions
+    - A higher-order function is any function to which you can pass a lambda or a function reference as a parameter, or a function which returns one, or both.
+    For example, the filter standard-library function takes a predicate function as a parameter and is therefore a higher-order function:
+    list.filter { x > 0 }
+2 - Function types
+    val sum = { x: Int, y: Int -> x + y } <- 2 parameters x, y / (Int, Int) -> Int / parameter type and return type
+    val action = { println(42) } <- no parameter / () -> Unit
+    -> In this case, the compiler infers that both the sum and action variables have function types.
+
+    The Unit return type can be omitted when you declare a regular function, but a function type declaration always requires an explicit return type, so you
+    can’t omit Unit in this context
+
+    { x, y -> x + y } <-  omit the types of the parameters x, y in the lambda expression/ Because they’re specified in the function type as part of the
+                                                                                          variable declaration, you don’t need to repeat them in the lambda itself
+
+    var canReturnNull: (Int, Int) -> Int? = { null } <- marked as nullable
+    var funOrNull: ((Int, Int) -> Int)? = null
+
+       ->  the subtle difference between this example and the previous one
+        If you omit the parentheses, you’ll declare a function type with a nullable return type, and not a nullable variable of a function type
+
+3 - Using function types from Java
+    - Kotlin functions that use function types can be called easily from Java
+        + Java8: lambdas are automatically converted to values of function types
+        + In older Java versions: you can pass an instance of an anonymous class implementing the invoke method from the corresponding function interface:
+            /* Java */
+            new Function1<Integer, Integer>() {
+                @Override
+                public Integer invoke(Integer number){
+                    System.out.println(number);
+                    return number + 1;
+                }
+            });
+4 - Default and null values for parameters with function types
+    - com.example.ltrach.higherorderfunction.extensions#joinToString()
+
+5 - Returning functions from functions
+    - Example, calculating the cost of shipping depending on the selected shipping method
+    - You can define a function that chooses the appropriate logic variant and returns it as another function
+    - com.example.ltrach.higherorderfunction#getShippingCostCalculator()
+        + Declares a function that returns a function
+        + Returns lambdas from the function
+        + Stores the returned function in a variable
+        + Invokes the returned function
+6 -
