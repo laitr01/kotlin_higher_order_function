@@ -21,12 +21,11 @@ data class Person(
 )
 
 class ContactListFilters {
-    var prefix: String =
-        ""
+    var prefix: String = ""
     var onlyWithPhoneNumber: Boolean = false
     fun getPredicate(): (Person) -> Boolean {
         val startsWithPrefix = { p: Person
-            ->
+            -> p.phoneNumber != null
         }
         if (!onlyWithPhoneNumber) {
             return startsWithPrefix

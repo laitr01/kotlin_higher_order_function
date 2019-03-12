@@ -59,4 +59,58 @@ This chapter covers
         + Returns lambdas from the function
         + Stores the returned function in a variable
         + Invokes the returned function
-6 -
+
+6 - Removing duplication through lambdas
+    val averageWindowsDuration = log
+        .filter { it.os == OS.WINDOWS }
+        .map(SiteVisit::duration)
+        .average()
+    - Now, suppose you need to calculate the same statistics for Mac users. To avoid duplication, you can extract the platform as a parameter.
+
+    fun List<SiteVisit>.averageDurationFor(os: OS) =
+        filter { it.os == os }.map(SiteVisit::duration).average()
+
+MORE IMPORTANT
+
+    1. Inline functions: removing the overhead of lambdas
+       - lambdas are normally compiled to anonymous classes
+       - But that means every time you use a lambda expression, an extra class is created; and if
+       the lambda captures some variables, then a new object is created on every invocation.
+       This introduces runtime overhead, causing an implementation that uses a lambda to be less efficient than a function that executes the same code directly
+       -> If you mark a function with
+          the inline keyword, the compiler won’t generate a function call when this function is
+          used and instead will replace every call to the function with the actual code implementing
+          the function. Let’s explore how that works in detail and look at specific examples.
+
+    2. How inlining works
+       - When you declare a function as inline, its body is inlined—in other words, it’s
+         substituted directly instead of the function invocation. Let’s look at an example to
+         understand the resulting code.
+
+         inline fun <T> synchronized(lock: Lock, action: () -> T): T{
+             lock.lock()
+             try {
+                return action()
+             }finally {
+                lock.unlock()
+             }
+         }
+
+         val l = Lock()
+         synchronized(l) {
+            // ...
+         }
+       - Because you’ve declared the synchronized function as inline,
+       the code generated for every call to it is the same as for a synchronized statement in Java. The following call
+
+           fun foo(l: Lock){
+
+               println("Before sync")
+
+               synchronized(l){
+                  println("Action")
+               }
+
+               println("After sync")
+           }
+       3. Restrictions on inline functions
