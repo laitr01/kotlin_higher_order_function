@@ -4,9 +4,7 @@
 
 package com.example.ltrach.higherorderfunction
 
-import com.example.ltrach.higherorderfunction.chapter8higherorderfunction.Delivery
-import com.example.ltrach.higherorderfunction.chapter8higherorderfunction.Order
-import com.example.ltrach.higherorderfunction.chapter8higherorderfunction.getShippingCostCalculator
+import com.example.ltrach.higherorderfunction.chapter8higherorderfunction.*
 import com.example.ltrach.higherorderfunction.extensions.filter
 import com.example.ltrach.higherorderfunction.extensions.joinToString
 import org.junit.Assert.assertEquals
@@ -32,4 +30,23 @@ class HigherOrderFunctionTest {
         val calculator = getShippingCostCalculator(Delivery.EXPEDITED)
         assertEquals(calculator.invoke(Order(3)).toFloat(), 12.3f)
     }
+
+    @Test
+    fun findPeopleByAgeWithLambdaExpresionTest() {
+        val people = listOf(Person1("Alice", 29), Person1("Bob", 31))
+        val inliningCollectionOperation = InliningCollectionOperation()
+
+        assertEquals(inliningCollectionOperation.findPeopleByAgeWithLambdaExpresion(29, people), listOf(Person1("Alice", 29)))
+        assertEquals(inliningCollectionOperation.findPeopleByAgeWithLambdaExpresion(30, people), listOf<Person1>())
+    }
+
+    @Test
+    fun findPeopleByAgeWithoutLambdaExpresionTest() {
+        val people = listOf(Person1("Alice", 29), Person1("Bob", 31))
+        val inliningCollectionOperation = InliningCollectionOperation()
+
+        assertEquals(inliningCollectionOperation.findPeopleByAgeWithoutLambdaExpresion(29, people), listOf(Person1("Alice", 29)))
+        assertEquals(inliningCollectionOperation.findPeopleByAgeWithoutLambdaExpresion(30, people), listOf<Person1>())
+    }
+
 }

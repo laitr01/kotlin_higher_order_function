@@ -114,3 +114,50 @@ MORE IMPORTANT
                println("After sync")
            }
        3. Restrictions on inline functions
+            - Due to the way inlining is performed, not every function that uses lambdas can be inlined.
+            - Generally, the parameter can be inlined if it’s called directly or passed as an argument
+              to another inline function. Otherwise, the compiler will prohibit the inlining of the
+              parameter with an error message that says "Illegal usage of inline-parameter."
+
+            - Example:
+
+                fun <T, R> Sequence<T>.map(transform: (T) -> R): Sequence<R> {
+                    return TransformingSequence(this, transform)
+                }
+            -> The map function doesn’t call the function passed as the transform parameter directly.
+               Instead, it passes this function to the constructor of a class that stores it in a property
+               To support that, the lambda passed as the transform argument needs to be compiled into the standard non-inline representation,
+               as an anonymous class implementing a function interface.
+            ->
+                inline fun foo(inlined: () -> Unit, noinline notInlined: () -> Unit) {
+
+                    // If you have a function that takes two or more lambdas as parameters, you may choose
+                       to inline only some of them. This makes sense when one of the lambdas is expected to
+                       contain a lot of code or is used in a way that doesn’t allow inlining. You can mark the
+                       parameters that accept such non-inlineable lambdas with the noinline modifier
+
+                }
+        4. Inlining collection operations
+            - Let’s consider the performance of Kotlin standard library functions that work on
+              collections.
+            - Code: com.example.ltrach.higherorderfunction.chapter8higherorderfunction.InliningCollectionOperation.kt
+            - In Kotlin, the filter function is declared as inline. It means the bytecode of the
+              filter function, together with the bytecode of the lambda passed to it, will be inlined
+              where filter is called.
+            - As a result, the bytecode generated for the first version(findPeopleByAgeWithLambdaExpresion) that uses
+              filter is roughly the same as the bytecode generated for the second version(findPeopleByAgeWithoutLambdaExpresion). You can
+              safely use idiomatic operations on collections, and Kotlin’s support for inline functions
+              ensures that you don’t need to worry about performance.
+
+        5. Deciding when to declare functions as inline
+            - Using the inline keyword can improve performance only with functions that take lambdas as parameters.
+            - For regular function calls, the Java virtual machine already provides powerful inlining
+              support. It analyzes the execution of your code and inlines calls whenever doing so
+              provides the most benefit.
+            - This happens automatically and at the machine-code level.
+            - In bytecode, the implementation of each function is repeated only once and doesn’t need to be copied every place where the function is called, as with Kotlin’s
+            - You save not only on the call, but also on the creation of the extra class for each lambda and an object for the lambda instance.
+            - Second, the JVM currently isn’t smart enough to always perform inlining through the call and the lambda. Finally, inlining lets you use features that are impossible
+              to make work with regular lambdas, such as non-local returns, which we’ll discuss later.
+        6. Using inlined lambdas for resource management
+            -
